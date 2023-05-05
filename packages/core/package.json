@@ -18,5 +18,8 @@
   ],
   "scripts": {
     "test": "node ./__tests__/core.test.js"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
