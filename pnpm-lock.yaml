@@ -3,10 +3,6 @@ lockfileVersion: '6.0'
 importers:
 
   .:
-    dependencies:
-      '@peui-cli/core':
-        specifier: workspace:^
-        version: link:packages/core
     devDependencies:
       lerna:
         specifier: ^6.6.2
