@@ -8,7 +8,11 @@ importers:
         specifier: ^6.6.2
         version: 6.6.2
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      '@peui-cli/utils':
+        specifier: file:../utils
+        version: file:packages/utils
 
   packages/utils: {}
 
@@ -4533,3 +4537,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  file:packages/utils:
+    resolution: {directory: packages/utils, type: directory}
+    name: '@peui-cli/utils'
+    version: 0.0.2
+    dev: false
