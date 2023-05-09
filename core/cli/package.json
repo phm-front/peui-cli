@@ -23,6 +23,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@peui-cli/utils": "file:../utils"
+    "@peui-cli/utils": "file:../../utils/utils",
+    "import-local": "^3.1.0",
+    "npmlog": "^7.0.1"
   }
 }
