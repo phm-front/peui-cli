@@ -1,0 +1,32 @@
+{
+  "name": "@peui-cli/log",
+  "version": "0.0.2",
+  "description": "log",
+  "author": "phm-front <506129591@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phm-front/peui-cli.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/@peui-cli/log.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/phm-front/peui-cli/issues"
+  },
+  "dependencies": {
+    "npmlog": "^7.0.1"
+  }
+}
