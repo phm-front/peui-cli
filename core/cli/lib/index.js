@@ -1,90 +1,129 @@
 'use strict';
 
+const { execSync } = require('child_process')
 const path = require('path');
 const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
-console.log(userHome)
+const { sync } = require('path-exists')
+const commander = require('commander');
 
 const log = require('@peui-cli/log');
 
 const constant = require('../const/index');
 const pkg = require('../package.json');
 
+const program = new commander.Command();
+
 module.exports = main;
 
-async function main() {
+function main() {
   try {
     // 检查版本号
-    checkPkgVersion()
+    checkPkgVersion();
     // 检查node版本
-    checkNodeVersion()
+    checkNodeVersion();
     // 检查root
-    checkRoot()
+    checkRoot();
     // 检查用户主目录
-    await checkUserHome()
-    // 检查入参
-    checkInputArgs()
+    checkUserHome();
     // 检查环境变量
-    await checkEnv()
+    checkEnv();
+    // 检查脚手架是否需要升级
+    // checkGlobalUpdate();
+    // 注册脚手架
+    registerCommand();
   } catch (error) {
-    log.error(error.message)
+    log.error(error.message);
+  }
+}
+
+function registerCommand() {
+  program
+    .name('peui')
+    .usage('<command> [options]')
+    .version(pkg.version)
+    .option('-d, --debug', '是否开启调试模式', false)
+  // 注册init命令
+  program
+    .command('init [projectName]')
+    .option('-f, --force', '是否强制初始化项目')
+    .action((projectName, options) => {
+      console.log(projectName, options)
+    });
+  // 处理debug模式
+  program.on('option:debug', function () {
+    if (program.opts().debug) {
+      process.env.LOG_LEVEL = 'verbose';
+    } else {
+      process.env.LOG_LEVEL = 'info';
+    }
+    log.level = process.env.LOG_LEVEL;
+  });
+  // 未知命令监听
+  program.on('command:*', function (obj) {
+    const availableCommands = program.commands.map((cmd) => cmd.name());
+    log.error(colors.red('未知的命令：' + obj[0]));
+    if (availableCommands.length) {
+      log.info(colors.green('可用命令：' + availableCommands.join(',')));
+    }
+  });
+  // 参数解析
+  program.parse(process.argv);
+  // 未输入命令处理
+  if(program.args && program.args.length < 1) {
+    program.outputHelp();
+  }
+}
+
+// 检查脚手架是否需要升级
+function checkGlobalUpdate() {
+  // 获取当前版本号
+  const currentVersion = pkg.version;
+  const npmName = pkg.name;
+  // 获取npm模块最新版本号
+  const latestVersion = execSync(`npm view ${npmName} version`).toString().trim();
+  if (latestVersion && semver.gt(latestVersion, currentVersion)) {
+    log.warn(
+      colors.yellow(
+        `请手动更新 ${npmName}，当前版本：${currentVersion}，最新版本：${latestVersion}
+          更新命令：npm install -g ${npmName}`
+      )
+    );
   }
 }
 
 // 检查环境变量 环境变量可以在userHome/.env中配置
-async function checkEnv() {
-  const dotenv = require('dotenv')
-  const dotenvPath = path.resolve(userHome, '.env')
-  const { pathExistsSync } = await import('path-exists')
-  if (pathExistsSync(dotenvPath)) {
+function checkEnv() {
+  const dotenv = require('dotenv');
+  const dotenvPath = path.resolve(userHome, '.env');
+  if (sync(dotenvPath)) {
     // 注入环境变量
     dotenv.config({
-      path: dotenvPath
-    })
+      path: dotenvPath,
+    });
   }
   // 注入CLI_HOME_PATH
   // 如果用户主目录下的.env文件配置了CLI_HOME则使用配置的CLI_HOME
   // 否则使用默认的DEFAULT_CLI_HOME
-  createDefaultConfig()
-  log.verbose('环境变量', process.env.CLI_HOME_PATH)
+  createDefaultConfig();
+  log.verbose('环境变量', process.env.CLI_HOME_PATH);
 }
 // 注入CLI_HOME_PATH
 function createDefaultConfig() {
-  let cliHome
+  let cliHome;
   if (process.env.CLI_HOME) {
-    cliHome = path.join(userHome, process.env.CLI_HOME)
+    cliHome = path.join(userHome, process.env.CLI_HOME);
   } else {
-    cliHome = path.join(userHome, constant.DEFAULT_CLI_HOME)
+    cliHome = path.join(userHome, constant.DEFAULT_CLI_HOME);
   }
-  process.env.CLI_HOME_PATH = cliHome
-}
-
-// 检查入参
-function checkInputArgs() {
-  const minimist = require('minimist')
-  const args = minimist(process.argv.slice(2))
-  checkArgs(args)
-}
-
-function checkArgs(args) {
-  if (args.debug) {
-    process.env.LOG_LEVEL = 'verbose'
-  } else {
-    process.env.LOG_LEVEL = 'info'
-  }
-  log.level = process.env.LOG_LEVEL
+  process.env.CLI_HOME_PATH = cliHome;
 }
 
 // 检查用户主目录
-async function checkUserHome() {
-  const { pathExistsSync } = await import('path-exists')
-  try {
-    if (!userHome || !pathExistsSync(userHome)) {
-      throw new Error(colors.red('当前登录用户主目录不存在！'))
-    }
-  } catch (error) {
-    log.error(error.message)
+function checkUserHome() {
+  if (!userHome || !sync(userHome)) {
+    throw new Error(colors.red('当前登录用户主目录不存在！'));
   }
 }
 
@@ -92,24 +131,25 @@ async function checkUserHome() {
 function checkRoot() {
   // root-check使用了es module, 所以这里需要使用动态import导入
   import('root-check').then(({ default: rootCheck }) => {
-    rootCheck()
-  })
+    rootCheck();
+  });
 }
 
 // 检查node版本
 function checkNodeVersion() {
   // 获取当前node版本号
-  const currentVersion = process.version
+  const currentVersion = process.version;
   // 获取最低版本号
-  const lowestVersion = pkg.engines.node.replace('>=', '')
+  const lowestVersion = pkg.engines.node.replace('>=', '');
   // 比较版本号
   if (!semver.gte(currentVersion, lowestVersion)) {
-    throw new Error(colors.red(`peui-cli 需要安装 v${lowestVersion} 以上版本的 Node.js`))
+    throw new Error(
+      colors.red(`peui-cli 需要安装 v${lowestVersion} 以上版本的 Node.js`)
+    );
   }
 }
 
 // 检查脚手架版本
 function checkPkgVersion() {
-  log.notice('当前cli版本:', pkg.version)
+  log.notice('当前cli版本:', pkg.version);
 }
-

@@ -16,6 +16,9 @@ importers:
       colors:
         specifier: ^1.4.0
         version: 1.4.0
+      commander:
+        specifier: ^10.0.1
+        version: 10.0.1
       dotenv:
         specifier: ^16.0.3
         version: 16.0.3
@@ -29,8 +32,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1
       path-exists:
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^4.0.0
+        version: 4.0.0
       root-check:
         specifier: ^2.0.0
         version: 2.0.0
@@ -40,6 +43,8 @@ importers:
       user-home:
         specifier: ^3.0.0
         version: 3.0.0
+
+  utils/get-npm-info: {}
 
   utils/log:
     dependencies:
@@ -1220,6 +1225,11 @@ packages:
     dependencies:
       delayed-stream: 1.0.0
     dev: true
+
+  /commander@10.0.1:
+    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
+    engines: {node: '>=14'}
+    dev: false
 
   /common-ancestor-path@1.0.1:
     resolution: {integrity: sha512-L3sHRo1pXXEqX8VU28kfgUY+YGsk09hPqZiZmLacNib6XNTCM8ubYeT7ryXQw8asB1sKgcU5lkB7ONug08aB8w==}
@@ -3486,11 +3496,6 @@ packages:
   /path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
     engines: {node: '>=8'}
-
-  /path-exists@5.0.0:
-    resolution: {integrity: sha512-RjhtfwJOxzcFmNOi6ltcbcu4Iu+FL3zEj83dk4kAS+fVpTxXLO1b38RvJgT/0QwvV/L3aY9TAnyv0EOqW4GoMQ==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dev: false
 
   /path-is-absolute@1.0.1:
     resolution: {integrity: sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==}
