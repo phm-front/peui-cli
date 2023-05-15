@@ -8,8 +8,13 @@ importers:
         specifier: ^6.6.2
         version: 6.6.2
 
+  commands/init: {}
+
   core/cli:
     dependencies:
+      '@peui-cli/init':
+        specifier: file:../../commands/init
+        version: file:commands/init
       '@peui-cli/log':
         specifier: file:../../utils/log
         version: file:utils/log
@@ -25,9 +30,6 @@ importers:
       import-local:
         specifier: ^3.1.0
         version: 3.1.0
-      minimist:
-        specifier: ^1.2.8
-        version: 1.2.8
       npmlog:
         specifier: ^7.0.1
         version: 7.0.1
@@ -2818,6 +2820,7 @@ packages:
 
   /minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
+    dev: true
 
   /minipass-collect@1.0.2:
     resolution: {integrity: sha512-6T6lH0H8OG9kITm/Jm6tdooIbogG9e0tLgpY6mphXSm/A9u8Nq1ryBG+Qspiub9LjWlBPsPS3tWQ/Botq4FdxA==}
@@ -4593,6 +4596,12 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  file:commands/init:
+    resolution: {directory: commands/init, type: directory}
+    name: '@peui-cli/init'
+    version: 0.0.2
+    dev: false
 
   file:utils/log:
     resolution: {directory: utils/log, type: directory}

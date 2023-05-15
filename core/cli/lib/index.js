@@ -1,14 +1,15 @@
 'use strict';
 
-const { execSync } = require('child_process')
+const { execSync } = require('child_process');
 const path = require('path');
 const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
-const { sync } = require('path-exists')
+const { sync } = require('path-exists');
 const commander = require('commander');
 
 const log = require('@peui-cli/log');
+const init = require('@peui-cli/init');
 
 const constant = require('../const/index');
 const pkg = require('../package.json');
@@ -19,23 +20,29 @@ module.exports = main;
 
 function main() {
   try {
-    // 检查版本号
-    checkPkgVersion();
-    // 检查node版本
-    checkNodeVersion();
-    // 检查root
-    checkRoot();
-    // 检查用户主目录
-    checkUserHome();
-    // 检查环境变量
-    checkEnv();
-    // 检查脚手架是否需要升级
-    // checkGlobalUpdate();
-    // 注册脚手架
+    // 脚手架启动阶段检查
+    prepare();
+    // 注册command脚手架
     registerCommand();
   } catch (error) {
     log.error(error.message);
   }
+}
+
+// 脚手架启动阶段检查
+function prepare() {
+  // 检查版本号
+  checkPkgVersion();
+  // 检查node版本
+  checkNodeVersion();
+  // 检查root
+  checkRoot();
+  // 检查用户主目录
+  checkUserHome();
+  // 检查环境变量
+  checkEnv();
+  // 检查脚手架是否需要升级
+  // checkGlobalUpdate();
 }
 
 function registerCommand() {
@@ -44,13 +51,12 @@ function registerCommand() {
     .usage('<command> [options]')
     .version(pkg.version)
     .option('-d, --debug', '是否开启调试模式', false)
+    .option('-tp, --target-path <target-path>', '是否指定本地调试文件路径', '');
   // 注册init命令
   program
     .command('init [projectName]')
     .option('-f, --force', '是否强制初始化项目')
-    .action((projectName, options) => {
-      console.log(projectName, options)
-    });
+    .action(init);
   // 处理debug模式
   program.on('option:debug', function () {
     if (program.opts().debug) {
@@ -59,6 +65,10 @@ function registerCommand() {
       process.env.LOG_LEVEL = 'info';
     }
     log.level = process.env.LOG_LEVEL;
+  });
+  // 处理targetPath 设置环境变量
+  program.on('option:target-path', function (val) {
+    process.env.CLI_TARGET_PATH = val;
   });
   // 未知命令监听
   program.on('command:*', function (obj) {
@@ -71,7 +81,7 @@ function registerCommand() {
   // 参数解析
   program.parse(process.argv);
   // 未输入命令处理
-  if(program.args && program.args.length < 1) {
+  if (program.args && program.args.length < 1) {
     program.outputHelp();
   }
 }
@@ -82,7 +92,9 @@ function checkGlobalUpdate() {
   const currentVersion = pkg.version;
   const npmName = pkg.name;
   // 获取npm模块最新版本号
-  const latestVersion = execSync(`npm view ${npmName} version`).toString().trim();
+  const latestVersion = execSync(`npm view ${npmName} version`)
+    .toString()
+    .trim();
   if (latestVersion && semver.gt(latestVersion, currentVersion)) {
     log.warn(
       colors.yellow(
@@ -107,7 +119,6 @@ function checkEnv() {
   // 如果用户主目录下的.env文件配置了CLI_HOME则使用配置的CLI_HOME
   // 否则使用默认的DEFAULT_CLI_HOME
   createDefaultConfig();
-  log.verbose('环境变量', process.env.CLI_HOME_PATH);
 }
 // 注入CLI_HOME_PATH
 function createDefaultConfig() {
