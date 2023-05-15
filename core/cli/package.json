@@ -26,8 +26,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@peui-cli/init": "file:../../commands/init",
     "@peui-cli/log": "file:../../utils/log",
+    "@peui-cli/exec": "file:../exec",
     "colors": "^1.4.0",
     "commander": "^10.0.1",
     "dotenv": "^16.0.3",

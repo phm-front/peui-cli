@@ -9,10 +9,10 @@ const { sync } = require('path-exists');
 const commander = require('commander');
 
 const log = require('@peui-cli/log');
-const init = require('@peui-cli/init');
 
 const constant = require('../const/index');
 const pkg = require('../package.json');
+const exec = require('@peui-cli/exec');
 
 const program = new commander.Command();
 
@@ -26,6 +26,9 @@ function main() {
     registerCommand();
   } catch (error) {
     log.error(error.message);
+    if (program.opts().debug) {
+      console.log(error);
+    }
   }
 }
 
@@ -54,9 +57,10 @@ function registerCommand() {
     .option('-tp, --target-path <target-path>', '是否指定本地调试文件路径', '');
   // 注册init命令
   program
-    .command('init [projectName]')
+    .command('init <projectName>')
+    .description('初始化项目')
     .option('-f, --force', '是否强制初始化项目')
-    .action(init);
+    .action(exec);
   // 处理debug模式
   program.on('option:debug', function () {
     if (program.opts().debug) {
@@ -92,9 +96,7 @@ function checkGlobalUpdate() {
   const currentVersion = pkg.version;
   const npmName = pkg.name;
   // 获取npm模块最新版本号
-  const latestVersion = execSync(`npm view ${npmName} version`)
-    .toString()
-    .trim();
+  const latestVersion = execSync(`npm view ${npmName} version`).toString();
   if (latestVersion && semver.gt(latestVersion, currentVersion)) {
     log.warn(
       colors.yellow(
