@@ -1,7 +1,9 @@
 'use strict';
 
 const path = require('path');
+
 const Package = require('@peui-cli/package');
+const log = require('@peui-cli/log');
 
 // 命令与包的映射关系
 const SETTINGS = {
@@ -42,7 +44,10 @@ async function exec() {
       packageVersion
     })
   }
-  const rootFile = pkg.getRootFilePath();
-  require(rootFile).apply(null, arguments);
+  // 获取入口文件
+  const entryFile = pkg.getEntryFilePath();
+  if (!entryFile) return log.error('指定包的入口文件不存在');
+  // 执行入口文件
+  require(entryFile).apply(null, arguments);
 }
 module.exports = exec;

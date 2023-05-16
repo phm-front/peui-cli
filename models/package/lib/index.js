@@ -61,7 +61,7 @@ class Package {
     }
   }
   // 获取入口文件的路径
-  getRootFilePath() {
+  getEntryFilePath() {
     let targetPath = this.targetPath;
     if (this.storeDir) {
       targetPath = path.resolve(this.storeDir, this.packageName);

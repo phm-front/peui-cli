@@ -48,6 +48,9 @@ importers:
 
   core/exec:
     dependencies:
+      '@peui-cli/log':
+        specifier: file:../../utils/log
+        version: file:utils/log
       '@peui-cli/package':
         specifier: file:../../models/package
         version: file:models/package
@@ -4757,6 +4760,7 @@ packages:
     name: '@peui-cli/exec'
     version: 0.0.2
     dependencies:
+      '@peui-cli/log': file:utils/log
       '@peui-cli/package': file:models/package
       '@peui-cli/utils': file:utils/utils
     transitivePeerDependencies:
@@ -4774,6 +4778,7 @@ packages:
       npminstall: 7.8.0
       path-exists: 4.0.0
       pkg-dir: 5.0.0
+      semver: 7.5.0
     transitivePeerDependencies:
       - bluebird
       - supports-color
