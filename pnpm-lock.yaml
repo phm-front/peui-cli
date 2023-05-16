@@ -8,7 +8,11 @@ importers:
         specifier: ^6.6.2
         version: 6.6.2
 
-  commands/init: {}
+  commands/init:
+    dependencies:
+      '@peui-cli/command':
+        specifier: file:../../models/command
+        version: file:models/command
 
   core/cli:
     dependencies:
@@ -54,6 +58,18 @@ importers:
       '@peui-cli/package':
         specifier: file:../../models/package
         version: file:models/package
+
+  models/command:
+    dependencies:
+      '@peui-cli/log':
+        specifier: file:../../utils/log
+        version: file:utils/log
+      colors:
+        specifier: ^1.4.0
+        version: 1.4.0
+      semver:
+        specifier: ^7.5.0
+        version: 7.5.0
 
   models/package:
     dependencies:
@@ -4766,6 +4782,16 @@ packages:
     transitivePeerDependencies:
       - bluebird
       - supports-color
+    dev: false
+
+  file:models/command:
+    resolution: {directory: models/command, type: directory}
+    name: '@peui-cli/command'
+    version: 0.0.2
+    dependencies:
+      '@peui-cli/log': file:utils/log
+      colors: 1.4.0
+      semver: 7.5.0
     dev: false
 
   file:models/package:

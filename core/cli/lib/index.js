@@ -36,8 +36,6 @@ function main() {
 function prepare() {
   // 检查版本号
   checkPkgVersion();
-  // 检查node版本
-  checkNodeVersion();
   // 检查root
   checkRoot();
   // 检查用户主目录
@@ -146,20 +144,6 @@ function checkRoot() {
   import('root-check').then(({ default: rootCheck }) => {
     rootCheck();
   });
-}
-
-// 检查node版本
-function checkNodeVersion() {
-  // 获取当前node版本号
-  const currentVersion = process.version;
-  // 获取最低版本号
-  const lowestVersion = pkg.engines.node.replace('>=', '');
-  // 比较版本号
-  if (!semver.gte(currentVersion, lowestVersion)) {
-    throw new Error(
-      colors.red(`peui-cli 需要安装 v${lowestVersion} 以上版本的 Node.js`)
-    );
-  }
 }
 
 // 检查脚手架版本

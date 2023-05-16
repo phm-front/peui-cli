@@ -1,7 +1,19 @@
 'use strict';
 
-function init(projectName, options, command) {
-  console.log('init command action');
+const Command = require('@peui-cli/command')
+
+function init(argv) {
+  return new InitCommand(argv)
 }
 
-module.exports = init;
+class InitCommand extends Command {
+  initialize() {
+    
+  }
+  execute() {
+    
+  }
+}
+
+module.exports = init
+module.exports.InitCommand = InitCommand;
