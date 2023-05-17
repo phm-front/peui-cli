@@ -9,6 +9,15 @@ const MIN_NODE_VERSION = '14.0.0';
 
 class Command {
   constructor(argv) {
+    if (!argv) {
+      throw new Error(`初始化${this.constructor.name}参数不能为空！`);
+    }
+    if (!Array.isArray(argv)) {
+      throw new Error(`初始化${this.constructor.name}参数必须为数组！`);
+    }
+    if (!argv.length) {
+      throw new Error(`初始化${this.constructor.name}参数不能为空数组！`);
+    }
     this._argv = argv;
     const runner = new Promise((resolve, reject) => {
       let chain = Promise.resolve();
@@ -32,8 +41,12 @@ class Command {
       );
     }
   }
+  // 初始化参数
   initArgs() {
-    console.log('initArgs')
+    // 获取参数
+    this._cmd = this._argv[this._argv.length - 1];
+    this._options = this._argv[this._argv.length - 2];
+    this._argv = this._argv.slice(0, this._argv.length - 2);
   }
   initialize() {
     // 使用constructor.name获取子类类名

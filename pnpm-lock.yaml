@@ -13,6 +13,9 @@ importers:
       '@peui-cli/command':
         specifier: file:../../models/command
         version: file:models/command
+      '@peui-cli/log':
+        specifier: file:../../utils/log
+        version: file:utils/log
 
   core/cli:
     dependencies:

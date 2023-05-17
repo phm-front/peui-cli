@@ -27,6 +27,7 @@
     "url": "https://github.com/phm-front/peui-cli/issues"
   },
   "dependencies": {
-    "@peui-cli/command": "file:../../models/command"
+    "@peui-cli/command": "file:../../models/command",
+    "@peui-cli/log": "file:../../utils/log"
   }
 }

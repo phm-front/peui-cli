@@ -48,6 +48,10 @@ async function exec() {
   const entryFile = pkg.getEntryFilePath();
   if (!entryFile) return log.error('指定包的入口文件不存在');
   // 执行入口文件
-  require(entryFile).call(null, Array.from(arguments));
+  try {
+    require(entryFile).call(null, Array.from(arguments));
+  } catch (error) {
+    log.error(error.message);
+  }
 }
 module.exports = exec;
