@@ -18,7 +18,7 @@ class InitCommand extends Command {
   }
   // 执行命令
   execute() {
-    
+    console.log(this)
   }
 }
 
