@@ -28,6 +28,9 @@
   },
   "dependencies": {
     "@peui-cli/command": "file:../../models/command",
-    "@peui-cli/log": "file:../../utils/log"
+    "@peui-cli/log": "file:../../utils/log",
+    "fs-extra": "^11.1.1",
+    "inquirer": "^8.0.0",
+    "semver": "^7.5.0"
   }
 }

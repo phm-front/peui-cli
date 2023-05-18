@@ -57,7 +57,7 @@ function registerCommand() {
   program
     .command('init <projectName>')
     .description('初始化项目')
-    .option('-f, --force', '是否强制初始化项目')
+    .option('-f, --force', '是否强制初始化项目，如果当前目录不为空，会清空当前目录')
     .action(exec);
   // 处理debug模式
   program.on('option:debug', function () {
