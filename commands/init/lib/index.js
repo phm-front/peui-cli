@@ -2,11 +2,15 @@
 
 const fs = require('fs');
 const fse = require('fs-extra');
+const path = require('path');
 
 const inquirer = require('inquirer');
 const semver = require('semver');
+const ora = require('ora');
 const Command = require('@peui-cli/command');
 const log = require('@peui-cli/log');
+const request = require('@peui-cli/request');
+const Package = require('@peui-cli/package');
 
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
@@ -30,16 +34,45 @@ class InitCommand extends Command {
       // 准备阶段 获取项目基本信息
       const projectInfo = await this.prepare();
       if (projectInfo) {
-        log.verbose('projectInfo', projectInfo)
+        this.projectInfo = projectInfo;
+        log.verbose('projectInfo', projectInfo);
         // 下载模板
+        await this.downloadTemplate();
         // 安装模板
       }
     } catch (error) {
       log.error(error.message);
     }
   }
+  async downloadTemplate() {
+    const templateInfo = this.template.find(
+      item => item.npmName === this.projectInfo.projectTemplate
+    );
+    const homePath = process.env.CLI_HOME_PATH;
+    const targetPath = path.resolve(homePath, 'template');
+    const templateNpm = new Package({
+      targetPath,
+      storeDir: path.resolve(targetPath, 'node_modules'),
+      packageName: templateInfo.npmName,
+      packageVersion: templateInfo.version
+    });
+    if (!templateNpm.exist()) {
+      await templateNpm.install();
+    } else {
+      await templateNpm.update();
+    }
+  }
   // 准备阶段
   async prepare() {
+    // 判断项目模版是否存在
+    // 加载动画
+    const spinner = ora('获取模版信息...').start();
+    const template = await request.get('/project/template');
+    if (!template || template.length === 0) {
+      throw new Error('获取项目模版信息失败');
+    }
+    spinner.stop();
+    this.template = template;
     // 获取当前process目录路径
     const localPath = process.cwd();
     // 判断目录是否为空
@@ -90,7 +123,8 @@ class InitCommand extends Command {
     ]);
     let projectInfo = { type: projectType };
     log.verbose('projectType', projectType);
-    if (projectType === TYPE_PROJECT) { // 项目
+    if (projectType === TYPE_PROJECT) {
+      // 项目
       // 询问项目的基本信息
       const project = await inquirer.prompt([
         {
@@ -98,9 +132,9 @@ class InitCommand extends Command {
           name: 'projectName',
           message: '请确认项目名称',
           default: this.projectName,
-          validate: function(v) {
+          validate: function (v) {
             const done = this.async();
-            setTimeout(function() {
+            setTimeout(function () {
               // 校验规则：
               // 1. 首字母必须为英文字符
               // 2. 尾字母必须为英文或数字，不能为字符
@@ -114,14 +148,14 @@ class InitCommand extends Command {
               // Pass the return value in the done callback
               done(null, true);
             }, 0);
-          }
+          },
         },
         {
           type: 'input',
           name: 'projectVersion',
           message: '请输入项目版本号',
           default: '1.0.0',
-          validate: function(v) {
+          validate: function (v) {
             const done = this.async();
             setTimeout(() => {
               if (!semver.valid(v)) {
@@ -129,22 +163,35 @@ class InitCommand extends Command {
                 return;
               }
               done(null, true);
-            }, 0)
+            }, 0);
           },
-          filter: function(v) {
+          filter: function (v) {
             if (!!semver.valid(v)) {
-              return semver.valid(v)
+              return semver.valid(v);
             } else {
-              return v
+              return v;
             }
-          }
-        }
-      ])
-      projectInfo = Object.assign(projectInfo, project)
-    } else if (projectType === TYPE_COMPONENT) { // 组件
-
+          },
+        },
+        {
+          type: 'list',
+          name: 'projectTemplate',
+          message: '请选择项目模版',
+          choices: this.createTemplateChoice(),
+        },
+      ]);
+      projectInfo = Object.assign(projectInfo, project);
+    } else if (projectType === TYPE_COMPONENT) {
+      // 组件
     }
     return projectInfo;
+  }
+  // 创建模版选择
+  createTemplateChoice() {
+    return this.template.map((item) => ({
+      value: item.npmName,
+      name: item.name,
+    }));
   }
   // cwd文件夹是否为空 缓存类文件夹不算在内
   isDirEmpty(path) {

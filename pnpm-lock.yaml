@@ -16,12 +16,21 @@ importers:
       '@peui-cli/log':
         specifier: file:../../utils/log
         version: file:utils/log
+      '@peui-cli/package':
+        specifier: file:../../models/package
+        version: file:models/package
+      '@peui-cli/request':
+        specifier: file:../../utils/request
+        version: file:utils/request
       fs-extra:
         specifier: ^11.1.1
         version: 11.1.1
       inquirer:
         specifier: ^8.0.0
         version: 8.2.5
+      ora:
+        specifier: 5.4.1
+        version: 5.4.1
       semver:
         specifier: ^7.5.0
         version: 7.5.0
@@ -94,6 +103,9 @@ importers:
       npminstall:
         specifier: ^7.8.0
         version: 7.8.0
+      ora:
+        specifier: 5.4.1
+        version: 5.4.1
       path-exists:
         specifier: 4.0.0
         version: 4.0.0
@@ -111,6 +123,12 @@ importers:
       npmlog:
         specifier: ^7.0.1
         version: 7.0.1
+
+  utils/request:
+    dependencies:
+      axios:
+        specifier: ^1.4.0
+        version: 1.4.0
 
   utils/utils: {}
 
@@ -943,7 +961,6 @@ packages:
 
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
-    dev: true
 
   /at-least-node@1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
@@ -962,7 +979,6 @@ packages:
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
-    dev: true
 
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -1296,7 +1312,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
-    dev: true
 
   /commander@10.0.1:
     resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
@@ -1535,7 +1550,6 @@ packages:
   /delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
-    dev: true
 
   /delegates@1.0.0:
     resolution: {integrity: sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==}
@@ -1813,7 +1827,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: true
 
   /foreground-child@3.1.1:
     resolution: {integrity: sha512-TMKDUnIte6bfb5nWv7V/caI169OHgvwjb7V4WkeUvbQQdjr5rWKqHFiKWb/fcOwB+CzBT+qbWjvj+DVwRskpIg==}
@@ -1833,7 +1846,6 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
-    dev: true
 
   /formdata-node@4.4.1:
     resolution: {integrity: sha512-0iirZp3uVDjVGt9p49aTaqjk84TrglENEDuqfdlZQ1roC9CWlPk6Avf8EEnZNcAqPonwkG35x4n3ww/1THYAeQ==}
@@ -3781,7 +3793,6 @@ packages:
 
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
-    dev: true
 
   /pump@3.0.0:
     resolution: {integrity: sha512-LwZy+p3SFs1Pytd/jYct4wpv49HiYCqd9Rlc5ZVdk0V+8Yzv6jR5Blk3TRmPL1ft69TxP0IMZGJ+WPFU2BFhww==}
@@ -4812,6 +4823,16 @@ packages:
     version: 0.0.2
     dependencies:
       npmlog: 7.0.1
+    dev: false
+
+  file:utils/request:
+    resolution: {directory: utils/request, type: directory}
+    name: '@peui-cli/request'
+    version: 0.0.2
+    dependencies:
+      axios: 1.4.0
+    transitivePeerDependencies:
+      - debug
     dev: false
 
   file:utils/utils:

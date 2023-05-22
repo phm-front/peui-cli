@@ -6,6 +6,7 @@ const pkgDir = require('pkg-dir').sync;
 const npminstall = require('npminstall');
 const pathExists = require('path-exists').sync;
 const semver = require('semver');
+const ora = require('ora');
 
 const { isObject } = require('@peui-cli/utils');
 const formatPath = require('@peui-cli/format-path');
@@ -34,7 +35,7 @@ class Package {
     }
   }
   // 安装package
-  install() {
+  install(version) {
     // 不用判断targetPath是否存在，因为npminstall会自动创建
     return npminstall({
       root: this.targetPath,
@@ -43,21 +44,23 @@ class Package {
       pkgs: [
         {
           name: this.packageName,
-          version: this.packageVersion,
+          version: version || this.packageVersion,
         },
       ],
     });
   }
   // 更新package
   async update() {
+    const spinner = ora(`检查${this.packageName}版本...`).start();
     const latestVersion = execSync(`npm view ${this.packageName} version`).toString();
+    spinner.stop();
     // 获取缓存中的package版本
     const cacheDir = pkgDir(path.resolve(this.storeDir, this.packageName))
     const cachePkg = require(path.resolve(cacheDir, 'package.json'))
     const cacheVersion = cachePkg.version;
     // 最新版本大于缓存中的版本，更新
     if (semver.gt(latestVersion, cacheVersion)) {
-      await this.install();
+      await this.install(latestVersion);
     }
   }
   // 获取入口文件的路径

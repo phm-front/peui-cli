@@ -1,5 +1,5 @@
 {
-  "name": "@peui-cli/init",
+  "name": "@peui-cli/request",
   "version": "0.0.2",
   "description": "> TODO: description",
   "author": "phm-front <506129591@qq.com>",
@@ -21,19 +21,12 @@
     "url": "git+https://github.com/phm-front/peui-cli.git"
   },
   "scripts": {
-    "test": "node ./__tests__/@peui-cli/init.test.js"
+    "test": "node ./__tests__/@peui-cli/request.test.js"
   },
   "bugs": {
     "url": "https://github.com/phm-front/peui-cli/issues"
   },
   "dependencies": {
-    "@peui-cli/command": "file:../../models/command",
-    "@peui-cli/log": "file:../../utils/log",
-    "@peui-cli/request": "file:../../utils/request",
-    "@peui-cli/package": "file:../../models/package",
-    "fs-extra": "^11.1.1",
-    "inquirer": "^8.0.0",
-    "ora": "5.4.1",
-    "semver": "^7.5.0"
+    "axios": "^1.4.0"
   }
 }

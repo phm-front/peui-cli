@@ -30,6 +30,7 @@
     "@peui-cli/format-path": "file:../../utils/format-path",
     "@peui-cli/utils": "file:../../utils/utils",
     "npminstall": "^7.8.0",
+    "ora": "5.4.1",
     "path-exists": "4.0.0",
     "pkg-dir": "^5.0.0",
     "semver": "^7.5.0"
