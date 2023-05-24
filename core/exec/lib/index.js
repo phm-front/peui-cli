@@ -1,10 +1,10 @@
 'use strict';
 
 const path = require('path');
-const cp = require('child_process');
 
 const Package = require('@peui-cli/package');
 const log = require('@peui-cli/log');
+const { spawnPro } = require('@peui-cli/utils');
 
 // 命令与包的映射关系
 const SETTINGS = {
@@ -63,7 +63,7 @@ async function exec() {
     })
     argv[argv.length - 1] = o;
     const code = `require('${entryFile}').call(null, ${JSON.stringify(argv)})`;
-    const child = spawn('node', ['-e', code], {
+    const child = spawnPro('node', ['-e', code], {
       cwd: process.cwd(),
       // inherit 表示将父进程的输入输出流传递给子进程
       // 所以不用使用subprocess.stdout的方式来监听子进程的输出/错误等
@@ -83,14 +83,6 @@ async function exec() {
   } catch (error) {
     log.error(error.message);
   }
-}
-
-// 兼容windows
-function spawn(command, args, options = {}) {
-  const win32 = process.platform === 'win32';
-  const cmd = win32 ? 'cmd' : command;
-  const cmdArgs = win32 ? ['/c'].concat(command, args) : args;
-  return cp.spawn(cmd, cmdArgs, options);
 }
 
 module.exports = exec;

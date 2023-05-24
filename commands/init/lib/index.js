@@ -7,13 +7,26 @@ const path = require('path');
 const inquirer = require('inquirer');
 const semver = require('semver');
 const ora = require('ora');
+const kebabCase = require('kebab-case');
+const { glob } = require('glob');
+const ejs = require('ejs');
+
 const Command = require('@peui-cli/command');
 const log = require('@peui-cli/log');
 const request = require('@peui-cli/request');
 const Package = require('@peui-cli/package');
+const { spawnAsync } = require('@peui-cli/utils');
 
+// 初始化项目类型
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
+
+// 模版类型
+const TEMPLATE_TYPE_NORMAL = 'normal';
+const TEMPLATE_TYPE_CUSTOM = 'custom';
+
+// 命令白名单
+const WHITE_COMMAND = ['npm', 'cnpm', 'yarn'];
 
 function init(argv) {
   return new InitCommand(argv);
@@ -39,28 +52,116 @@ class InitCommand extends Command {
         // 下载模板
         await this.downloadTemplate();
         // 安装模板
+        await this.installTemplate();
       }
     } catch (error) {
       log.error(error.message);
+      if (process.env.LOG_LEVEL === 'verbose') {
+        console.log(error);
+      }
     }
   }
+  // 安装模版
+  async installTemplate() {
+    if (this.selectedTemplate) {
+      const { type = TEMPLATE_TYPE_NORMAL } = this.selectedTemplate;
+      switch (type) {
+        case TEMPLATE_TYPE_NORMAL:
+          // 标准模板安装
+          await this.normalTemplateInstall();
+          break;
+        case TEMPLATE_TYPE_CUSTOM:
+          // 自定义模板安装
+          await this.customTemplateInstall();
+          break;
+        default:
+          throw new Error(`未定义项目模版类型：${type}`);
+      }
+    } else {
+      throw new Error('未选择模版');
+    }
+  }
+  // ejs渲染
+  async ejsRender(options) {
+    const cwd = process.cwd();
+    const { ignore } = options;
+    const list = await glob('package.json', {
+      cwd,
+      ignore,
+      nodir: true
+    })
+    if (!list.length) throw new Error('模版不存在package.json文件');
+    const pkgPath = path.resolve(cwd, list[0]);
+    const { name, projectVersion } = this.projectInfo;
+    const res = await ejs.renderFile(pkgPath, { name, version: projectVersion }, {});
+    // 写入render后的package.json
+    fse.writeFileSync(pkgPath, res);
+  }
+  // 标准模板安装
+  async normalTemplateInstall() {
+    const { storeDir, packageName } = this.templateNpm;
+    // 模版路径
+    const templatePath = path.resolve(storeDir, packageName, 'template');
+    const targetPath = process.cwd();
+    // 确保目录存在
+    const spinner = ora('正在安装模版...').start();
+    fse.ensureDirSync(templatePath);
+    fse.ensureDirSync(targetPath);
+    fse.copySync(templatePath, targetPath);
+    spinner.stop();
+    log.success('模版安装成功');
+    // ejs模版渲染
+    const ignore = ['node_modules/**', 'public/**', 'dist/**'];
+    await this.ejsRender({ ignore });
+    const {
+      installCommand = 'npm i', startCommand = 'npm run dev'
+    } = this.selectedTemplate;
+    // 安装依赖
+    const code = await this.execCommand(installCommand);
+    if (code !== 0) throw new Error('依赖安装失败');
+    // 运行
+    this.execCommand(startCommand);
+  }
+  // 自定义模板安装
+  async customTemplateInstall() {}
+  // 执行shell命令
+  async execCommand(shell) {
+    const cmdArr = shell.split(' ');
+    const cmd = this.checkCommand(cmdArr[0]);
+    if (!cmd) throw new Error('命令不存在：' + cmdArr[0]);
+    const cmdArgs = cmdArr.slice(1);
+    return await spawnAsync(cmd, cmdArgs, {
+      cwd: process.cwd(),
+      stdio: 'inherit',
+    });
+  }
+  // 检查命令是否存在
+  checkCommand(cmd) {
+    if (WHITE_COMMAND.includes(cmd)) {
+      return cmd;
+    }
+    return null;
+  }
+  // 下载模版
   async downloadTemplate() {
     const templateInfo = this.template.find(
-      item => item.npmName === this.projectInfo.projectTemplate
+      (item) => item.npmName === this.projectInfo.projectTemplate
     );
+    this.selectedTemplate = templateInfo;
     const homePath = process.env.CLI_HOME_PATH;
     const targetPath = path.resolve(homePath, 'template');
     const templateNpm = new Package({
       targetPath,
       storeDir: path.resolve(targetPath, 'node_modules'),
       packageName: templateInfo.npmName,
-      packageVersion: templateInfo.version
+      packageVersion: templateInfo.version,
     });
     if (!templateNpm.exist()) {
       await templateNpm.install();
     } else {
       await templateNpm.update();
     }
+    this.templateNpm = templateNpm;
   }
   // 准备阶段
   async prepare() {
@@ -183,6 +284,10 @@ class InitCommand extends Command {
       projectInfo = Object.assign(projectInfo, project);
     } else if (projectType === TYPE_COMPONENT) {
       // 组件
+    }
+    if (projectInfo.projectName) {
+      // 将项目名称转换为驼峰命名
+      projectInfo.name = kebabCase(projectInfo.projectName).replace(/^-/, '');
     }
     return projectInfo;
   }

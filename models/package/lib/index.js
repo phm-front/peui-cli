@@ -10,6 +10,7 @@ const ora = require('ora');
 
 const { isObject } = require('@peui-cli/utils');
 const formatPath = require('@peui-cli/format-path');
+const log = require('@peui-cli/log');
 
 class Package {
   constructor(options) {
@@ -35,9 +36,9 @@ class Package {
     }
   }
   // 安装package
-  install(version) {
+  async install(version) {
     // 不用判断targetPath是否存在，因为npminstall会自动创建
-    return npminstall({
+    await npminstall({
       root: this.targetPath,
       storeDir: this.storeDir,
       registry: 'https://registry.npmjs.org',
@@ -48,10 +49,15 @@ class Package {
         },
       ],
     });
+    if (version) {
+      log.success(`更新${this.packageName}成功`);
+    } else {
+      log.success(`安装${this.packageName}成功`);
+    }
   }
   // 更新package
   async update() {
-    const spinner = ora(`检查${this.packageName}版本...`).start();
+    const spinner = ora(`检查${this.packageName}版本是否需要更新...`).start();
     const latestVersion = execSync(`npm view ${this.packageName} version`).toString();
     spinner.stop();
     // 获取缓存中的package版本
