@@ -1,6 +1,6 @@
 {
   "name": "@peui-cli/core",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "author": "phm-front <506129591@qq.com>",
   "homepage": "",
@@ -23,8 +23,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@peui-cli/log": "file:../../utils/log",
     "@peui-cli/exec": "file:../exec",
+    "@peui-cli/log": "file:../../utils/log",
     "colors": "^1.4.0",
     "commander": "^10.0.1",
     "dotenv": "^16.0.3",

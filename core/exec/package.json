@@ -1,6 +1,6 @@
 {
   "name": "@peui-cli/exec",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "> TODO: description",
   "author": "phm-front <506129591@qq.com>",
   "homepage": "https://github.com/phm-front/peui-cli#readme",
@@ -27,8 +27,8 @@
     "url": "https://github.com/phm-front/peui-cli/issues"
   },
   "dependencies": {
-    "@peui-cli/package": "file:../../models/package",
     "@peui-cli/log": "file:../../utils/log",
+    "@peui-cli/package": "file:../../models/package",
     "@peui-cli/utils": "file:../../utils/utils"
   }
 }

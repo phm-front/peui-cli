@@ -1,6 +1,6 @@
 {
   "name": "@peui-cli/package",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "> TODO: description",
   "author": "phm-front <506129591@qq.com>",
   "homepage": "https://github.com/phm-front/peui-cli#readme",
@@ -28,8 +28,8 @@
   },
   "dependencies": {
     "@peui-cli/format-path": "file:../../utils/format-path",
-    "@peui-cli/utils": "file:../../utils/utils",
     "@peui-cli/log": "file:../../utils/log",
+    "@peui-cli/utils": "file:../../utils/utils",
     "npminstall": "^7.8.0",
     "ora": "5.4.1",
     "path-exists": "4.0.0",
