@@ -8,7 +8,7 @@ const { spawnPro } = require('@peui-cli/utils');
 
 // 命令与包的映射关系
 const SETTINGS = {
-  init: '@peui-cli/utils'
+  init: '@peui-cli/init'
 };
 
 // 缓存dir
