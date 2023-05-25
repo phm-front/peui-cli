@@ -139,7 +139,30 @@ class InitCommand extends Command {
     this.execCommand(startCommand);
   }
   // 自定义模板安装
-  async customTemplateInstall() {}
+  async customTemplateInstall() {
+    const { storeDir, packageName } = this.templateNpm;
+    const entryPath = path.resolve(storeDir, packageName, 'index.js');
+    if (fse.pathExists(entryPath)) {
+      const options = {
+        ...this.templateNpm,
+        sourcePath: path.resolve(storeDir, packageName, 'template'),
+        targetPath: process.cwd()
+      }
+      const codeStr = `require('${entryPath}')(${JSON.stringify(options)})`
+      // 执行自定义模板
+      const code = await spawnAsync('node', ['-e', codeStr], {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+      });
+      if (code === 0) {
+        log.success('自定义模版安装成功')
+      } else {
+        throw new Error('自定义模版安装失败')
+      }
+    } else {
+      throw new Error('自定义模版入口文件不存在');
+    }
+  }
   // 执行shell命令
   async execCommand(shell) {
     const cmdArr = shell.split(' ');
