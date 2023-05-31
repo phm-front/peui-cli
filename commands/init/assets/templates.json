@@ -1,0 +1,32 @@
+[
+  {
+    "name": "vue3模版",
+    "npmName": "peui-cli-template-vue3",
+    "version": "latest",
+    "type": "normal",
+    "installCommand": "cnpm i",
+    "startCommand": "npm run dev",
+    "tag": ["project"],
+    "ignore": ["**/node_modules/**"]
+  },
+  {
+    "name": "vue2模版",
+    "npmName": "peui-cli-template-vue2",
+    "version": "latest",
+    "type": "normal",
+    "installCommand": "yarn",
+    "startCommand": "yarn run serve",
+    "tag": ["project"],
+    "ignore": ["**/node_modules/**", "**/public/**"]
+  },
+  {
+    "name": "组件库模版",
+    "npmName": "peui-cli-template-components",
+    "version": "latest",
+    "type": "normal",
+    "installCommand": "cnpm i",
+    "startCommand": "npm run dev",
+    "tag": ["component"],
+    "ignore": ["**/node_modules/**", "**/public/**"]
+  }
+]
