@@ -6,6 +6,7 @@ const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
 const { sync } = require('path-exists');
+const { ensureDirSync } = require('fs-extra');
 const commander = require('commander');
 
 const log = require('@peui-cli/log');
@@ -18,10 +19,10 @@ const program = new commander.Command();
 
 module.exports = main;
 
-function main() {
+async function main() {
   try {
     // 脚手架启动阶段检查
-    prepare();
+    await prepare();
     // 注册command脚手架
     registerCommand();
   } catch (error) {
@@ -33,11 +34,11 @@ function main() {
 }
 
 // 脚手架启动阶段检查
-function prepare() {
+async function prepare() {
   // 检查版本号
   checkPkgVersion();
   // 检查root
-  checkRoot();
+  await checkRoot();
   // 检查用户主目录
   checkUserHome();
   // 检查环境变量
@@ -58,6 +59,13 @@ function registerCommand() {
     .command('init <projectName>')
     .description('初始化项目')
     .option('-f, --force', '是否强制初始化项目，如果当前目录不为空，会清空当前目录')
+    .action(exec);
+  // 注册public命令
+  program
+    .command('publish')
+    .option('-rs, --rechoice-server', '重新选择代码托管平台', false)
+    .option('-rt, --rewrite-token', '重新录入token', false)
+    .description('发布项目')
     .action(exec);
   // 处理debug模式
   program.on('option:debug', function () {
@@ -129,6 +137,8 @@ function createDefaultConfig() {
     cliHome = path.join(userHome, constant.DEFAULT_CLI_HOME);
   }
   process.env.CLI_HOME_PATH = cliHome;
+  // 如果缓存目录不存在则创建 保证缓存目录存在
+  ensureDirSync(cliHome);
 }
 
 // 检查用户主目录
@@ -139,9 +149,9 @@ function checkUserHome() {
 }
 
 // 检查root root降级
-function checkRoot() {
+async function checkRoot() {
   // root-check使用了es module, 所以这里需要使用动态import导入
-  import('root-check').then(({ default: rootCheck }) => {
+  await import('root-check').then(({ default: rootCheck }) => {
     rootCheck();
   });
 }

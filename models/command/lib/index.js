@@ -47,6 +47,9 @@ class Command {
     this._cmd = this._argv[this._argv.length - 1];
     this._options = this._argv[this._argv.length - 2];
     this._argv = this._argv.slice(0, this._argv.length - 2);
+    log.verbose('cmd', this._cmd);
+    log.verbose('options', this._options);
+    log.verbose('argv', this._argv);
   }
   initialize() {
     // 使用constructor.name获取子类类名

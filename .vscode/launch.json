@@ -11,7 +11,12 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/core/cli/bin/index.js"
+      "program": "${workspaceFolder}/core/cli/bin/index.js",
+      "args": [
+        "publish",
+        "-tp",
+        "/Users/penghuaimin/Documents/my-projects/node-cli/peui-cli/commands/publish"
+      ]
     }
   ]
 }
