@@ -10,10 +10,10 @@ class GitServer {
   setToken() {
     error('setToken');
   }
-  createRepo() {
+  createRepo(repoName) {
     error('createRepo');
   }
-  createOrgRepo() {
+  createOrgRepo(repoName, login) {
     error('createOrgRepo');
   }
   getRemote() {
@@ -24,6 +24,9 @@ class GitServer {
   }
   getOrg() {
     error('getOrg');
+  }
+  getRepo(login, name) {
+    error('getRepo');
   }
 }
 

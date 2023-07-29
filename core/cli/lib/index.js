@@ -65,6 +65,7 @@ function registerCommand() {
     .command('publish')
     .option('-rs, --rechoice-server', '重新选择代码托管平台', false)
     .option('-rt, --rewrite-token', '重新录入token', false)
+    .option('-ro, --rechoice-owner', '重新选择远程仓库类型', false)
     .description('发布项目')
     .action(exec);
   // 处理debug模式
