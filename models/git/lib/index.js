@@ -78,9 +78,17 @@ class Git {
   async commit() {
     // 1、生成开发分支版本号
     await this.getCorrectVersion();
-    // 2、在开发分支上提交
-    // 3、合并远程开发分支
-    // 4、推送开发分支
+    // 2、切换分支前检查是否有未提交的代码
+    await this.checkUncommit();
+    // 3、切换开发分支
+    await this.checkoutBranch(this.branch);
+    // 4、合并远程master分支和开发分支代码
+    await this.pullRemoteMasterAndBranch();
+    // 5、修改package.json版本号 commit代码
+    this.updatePackageJsonVersion(this.version);
+    await this.checkUncommit();
+    // 6、推送代码到远程开发分支
+    await this.pushBrach(this.branch);
   }
   // 生成开发分支 major/minor/patch
   async getCorrectVersion() {
@@ -119,7 +127,40 @@ class Git {
       this.branch = `${VERSION_DEV}/${incVersion}`;
       this.version = incVersion;
       // 更新package.json版本号
-      this.updatePackageJsonVersion(this.version);
+      // this.updatePackageJsonVersion(this.version);
+    }
+  }
+  async checkoutBranch(branch) {
+    // 获取所有本地分支
+    const localBranchList = await this.git.branchLocal();
+    if (localBranchList.all.includes(branch)) {
+      // 本地分支存在
+      await this.git.checkout(branch);
+      log.success(`切换到本地分支${branch}`);
+    } else {
+      // 本地分支不存在
+      await this.git.checkoutBranch(branch, 'master');
+      log.success(`创建并切换到本地分支${branch}`);
+    }
+  }
+  // 合并远程master分支和开发分支代码
+  async pullRemoteMasterAndBranch() {
+    log.info(`合并远程 [master] -> [${this.branch}]`);
+    await this.pullRemoteBranch('master');
+    log.success('合并master分支代码成功');
+    // 检查代码冲突
+    await this.checkConflicts()
+    log.info('检查远程开发分支')
+    const remoteBranchList = await this.getRemoteBranchList(VERSION_DEV);
+    console.log('remoteBranchList', remoteBranchList)
+    if (remoteBranchList.includes(this.version)) {
+      // 存在远程开发分支 拉取代码
+      log.info(`合并远程 [${this.branch}] -> [${this.branch}]`);
+      await this.pullRemoteBranch(this.branch);
+      log.success(`合并远程${this.branch}分支代码成功`);
+      await this.checkConflicts()
+    } else {
+      log.success(`远程不存在${this.branch}分支`)
     }
   }
   // 获取远程分支列表
@@ -129,7 +170,7 @@ class Git {
     if (type === VERSION_RELEASE) {
       reg = /.+?refs\/tags\/release\/(\d+\.\d+\.\d+)/g;
     } else {
-      // reg = /.+?refs\/heads\/dev\/(\d+\.\d+\.\d+)/g;
+      reg = /.+?refs\/heads\/dev\/(\d+\.\d+\.\d+)/g;
     }
     const result = [];
     remoteList.split('\n').forEach(item => {
@@ -146,7 +187,14 @@ class Git {
   }
   // 更新package.json版本号
   updatePackageJsonVersion(version) {
-    
+    const pkgPath = path.resolve(this.dir, 'package.json');
+    const pkg = fs.readJSONSync(pkgPath);
+    // 版本号不同才更新
+    if (pkg.version !== version) {
+      pkg.version = version;
+      fs.writeJSONSync(pkgPath, pkg, { spaces: 2 });
+      log.success('package.json版本号更新成功', version);
+    }
   }
   // 检查用户远程仓库类型 初始化gitServer
   async checkGitServer() {

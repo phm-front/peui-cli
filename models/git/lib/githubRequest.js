@@ -1,5 +1,5 @@
 const axios = require('axios');
-
+const log = require('@peui-cli/log');
 class GiteeRequest {
   constructor(token) {
     this.token = token;
@@ -19,6 +19,9 @@ class GiteeRequest {
       response => response.data,
       error => {
         if (error.response) {
+          if (error.response.status === 401) {
+            log.warn('token失效，请重新设置token！');
+          }
           return Promise.reject(error.response);
         } else {
           return Promise.reject(error);
